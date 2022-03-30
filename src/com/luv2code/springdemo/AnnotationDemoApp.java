@@ -1,0 +1,33 @@
+package com.luv2code.springdemo;
+
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class AnnotationDemoApp {
+    public static void main(String[] args) {
+        // leemos ela archivo de configuraciones de spring
+        ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("applicationContext.xml");
+
+        // obtenemos el bean del contenedor de spring
+        // si en @Component no especificamos el bean Id entonces el default 
+        // es el mismo que el nombre de la clase con la primer letra en minuscula
+        Coach myCoach = context.getBean("tennisCoach",Coach.class);
+
+        // llamamos un metodo del bean
+        System.out.println(myCoach.getDailyWorkout());
+
+        // lamamos al metodo inyectaqdo en el constructor
+        System.out.println(myCoach.getDailyFortune());
+
+        // Lo mismo pero con setter inyection
+         Coach myChessCoach = context.getBean("chessCoach",Coach.class);
+
+        // llamamos un metodo del bean
+        System.out.println(myChessCoach.getDailyWorkout());
+
+        // lamamos al metodo inyectaqdo en el constructor
+        System.out.println(myChessCoach.getDailyFortune());
+    
+        // cerramos el context
+        context.close();
+    }
+}
