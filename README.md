@@ -207,4 +207,48 @@ Use the following steps to add it to your Java Build Path.
 
 Eclipse will perform a rebuild of your project and it will resolve the related build errors.
 
-<details>
+</details>
+
+# Configuración de spring con código Java
+
+Hay otra forma de configurar el contenedor de spring que es usando solamente código java sin archivos xml.
+
+Para esto usamos una clase de configuración que tiene que tener las annotations `@Configuration` que indica que es la clase de configuración y `ComponentScan` al cual le pasamos un parámetro para indicar que paquete debe escanear.
+
+```
+
+@Configuration
+@ComponentScan("com.luv2code.springdemo")
+public class SportsConfig {
+
+}
+
+```
+
+Para obtener el contexto ahora lo que hacemos es instanciar el contexto con la clase `AnnotationConfigApplicationContext` de pasando como parámetro la clase de configuración
+
+```
+AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(SportsConfig.class);
+
+```
+
+Una ventaja de este forma de configurar el spring container es que dentro de la clase podemos crear beans sin la necesidad de haber implementado annotations en las clases. Esto lo hacemos con la annotation `@Bean` sobre un método, el nombre del método pasara a ser el BeanId y el valor que devuelve el el Bean que queremos recuperar para usar en el programa.
+
+```
+@Configuration
+@ComponentScan("com.luv2code.springdemo")
+public class SportsConfig {
+
+    @Bean
+    public Coach swimCoach(){
+        SwimCoach mySwimCoach = new SwimCoach();
+        return mySwimCoach;
+    }
+
+}
+
+```
+
+En este caso no estamos usando component scan estamos directamente instanciando la clase.
+
+Es importante notar que los beans son singleton es decir la primera vez que se ejecute va a crear un nuevo objeto que quedara registrado en el spring container. Si luego se quiere acceder a este bean la annotation intercepta la llamada en caso de que ya este creado devuelve la referencia en memoria y no ejecuta el código del método.
