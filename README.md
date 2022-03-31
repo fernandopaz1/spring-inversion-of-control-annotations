@@ -112,3 +112,99 @@ public class TennisCoach implements Coach {
     }
 }
 ```
+
+No necesariamente tiene que ser un método setter para poder hacer el autowiring, podemos hacerlo con cualquier tipo de método.
+
+### Inyección de campos
+
+De esta forma podemos inyectar dependencias a valores de las clases directamente incluso si son valores privados (usando reflexión). Las ventajas son que la inyección es aplicada directamente al campo y que no son necesarios métodos setter.
+
+En este caso la annotation `@Autowired` va sobre el campo que queremos inyectar sin necesidad de agregar un setter.
+
+```
+@Component
+public class TennisCoach implements Coach {
+    @Autowired
+    private FortuneService fortuneService;
+
+    public TennisCoach() {
+
+    }
+    ...
+}
+```
+
+Si tenemos multiples implementaciones compatibles con el autowiring nos dará excepción ya que para inyectar dependencias esta debe estar determinada univocamente. Esto lo hacemos con la annotation `@Qualifier` y le pasamos como parámetro el BeanId. La annotation `@Qualifier` puede usarse en cualquier tipo de inyección.
+
+@Component
+public class TennisCoach implements Coach {
+@Autowired
+@Qualifier("happyFortuneService")
+private FortuneService fortuneService;
+
+    public TennisCoach() {
+
+    }
+    ...
+
+}
+
+```
+
+En el caso especifico de inyección por constructor el `@Qualifier` no va sobre el constructor sino que como modificador del parámetro:
+
+@Component
+public class TennisCoach implements Coach {
+
+    private FortuneService fortuneService;
+
+    @Autowired
+    public TennisCoach( @Qualifier("happyFortuneService") FortuneService theFortuneService){
+        fortuneService = theFortuneService;
+    }
+    ...
+}
+```
+
+Esto se debe a que de esta forma el constructor puede inyectar mas de una dependencia.
+Es importante también aclarar que si el bean tiene un nombre con las dos primeras letras en mayúscula spring no transforma el nombre para crear el beanId por lo que el BeanId es el mismo que el nombre de la clase.
+
+## Ciclo de vida con annotations
+
+### Scopes
+
+Podemos especificar el scope que tiene cada bean con la annotation `@scope` pasando como parámetro el valor de scope deseado.
+
+### PostConstruct y PreDestroy
+
+Para especificar que métodos llamar al crear o eliminar un objeto usamos las annotations `@PostConstruct` y `@PreDestroy` respectivamente.
+En caso de que estemos en java 9 o versiones posteriores es necesario hacer unos pasos extras ya que javax.annotation fue removido del classpath por defecto:
+
+<details>
+ <summary>Solucón</summary>
+
+1. Download the javax.annotation-api-1.3.2.jar from
+
+https://search.maven.org/remotecontent?filepath=javax/annotation/javax.annotation-api/1.3.2/javax.annotation-api-1.3.2.jar
+
+2. Copy the JAR file to the lib folder of your project
+
+---
+
+Use the following steps to add it to your Java Build Path.
+
+3. Right-click your project, select Properties
+
+4. On left-hand side, click Java Build Path
+
+5. In top-center of dialog, click Libraries
+
+6. Click Classpath and then Click Add JARs ...
+
+7. Navigate to the JAR file <your-project>/lib/javax.annotation-api-1.3.2.jar
+
+8. Click OK then click Apply and Close
+
+Eclipse will perform a rebuild of your project and it will resolve the related build errors.
+
+<details>
